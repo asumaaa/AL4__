@@ -333,7 +333,7 @@ void Object3d::LoadTexture()
 	ScratchImage scratchImg{};
 
 	// WICテクスチャのロード
-	result = LoadFromWICFile( L"Resources/tex1.png", WIC_FLAGS_NONE, &metadata, scratchImg);
+	result = LoadFromWICFile( L"Resources/texture.png", WIC_FLAGS_NONE, &metadata, scratchImg);
 	assert(SUCCEEDED(result));
 
 	ScratchImage mipChain{};
@@ -434,29 +434,9 @@ void Object3d::CreateModel()
 			line_stream >> position.z;
 			//座標データに追加
 			positions.emplace_back(position);
-			//頂点データに追加
-			/*VertexPosNormalUv vertex{};
-			vertex.pos = position;
-			vertices.emplace_back(vertex);*/
 		}
 
-		//先頭文字がfならポリゴン(三角形)
-		if (key == "f")
-		{
-			//半角スペース区切りで行の続きを読み込む
-			string index_string;
-			while (getline(line_stream, index_string, ' '))
-			{
-				//頂点インデックス1個分の文字列をストーリームに変換して解析しやすくする
-				std::istringstream index_stream(index_string);
-				unsigned short indexPosition;
-				index_stream >> indexPosition;
-				//頂点インデックスに追加
-				indices.emplace_back(indexPosition-1);
-			}
-		}
-
-		//先頭文字がvtならテクスチャ
+		//先頭文字列がvtならテクスチャ
 		if (key == "vt")
 		{
 			//U.V成分読み込み
@@ -469,30 +449,31 @@ void Object3d::CreateModel()
 			texcoords.emplace_back(texcoord);
 		}
 
-		//先頭文字がvnなら法線ベクトル
+		//先頭文字列がvnなら法線ベクトル
 		if (key == "vn")
 		{
-			//X,Y,Z成分読み込み
+			//U.V成分読み込み
 			XMFLOAT3 normal{};
 			line_stream >> normal.x;
 			line_stream >> normal.y;
-			line_stream >> normal.z;
+			line_stream >> normal.y;
 			//法線ベクトルデータに追加
 			normals.emplace_back(normal);
 		}
-		//先頭文字がfならポリゴン
+
+		//先頭文字がfならポリゴン(三角形)
 		if (key == "f")
 		{
 			//半角スペース区切りで行の続きを読み込む
 			string index_string;
 			while (getline(line_stream, index_string, ' '))
 			{
-				//頂点インデックス1個分の文字列をストリームに変換して解析しやすくする
+				//頂点インデックス1個分の文字列をストーリームに変換して解析しやすくする
 				std::istringstream index_stream(index_string);
-				unsigned short indexPosition, indexNormal, indexTexcoord;
+				unsigned short indexPosition, indexNormal,indexTexcoord;
 				index_stream >> indexPosition;
 				index_stream.seekg(1, ios_base::cur);
-				index_stream>>indexTexcoord;
+				index_stream >> indexTexcoord;
 				index_stream.seekg(1, ios_base::cur);
 				index_stream >> indexNormal;
 				//頂点データの追加
@@ -510,7 +491,7 @@ void Object3d::CreateModel()
 	file.close();
 
 	std::vector<VertexPosNormalUv> realVertices;
-
+	
 	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * vertices.size());
 
 	// ヒーププロパティ
