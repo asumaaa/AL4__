@@ -180,6 +180,13 @@ void Object3d::LoadMaterial(const std::string& directoryPath, const std::string&
 			line_stream >> material.ambient.y;
 			line_stream >> material.ambient.z;
 		}
+		//先頭文字列がKdならアンビエント名
+		if (key == "Kd")
+		{
+			line_stream >> material.diffuse.x;
+			line_stream >> material.diffuse.y;
+			line_stream >> material.diffuse.z;
+		}
 		//先頭文字列がKsならスペキュラー色
 		if (key == "Ks")
 		{
@@ -542,7 +549,7 @@ void Object3d::CreateModel()
 	/*file.open("Resources/triangle/triangle_tex.obj");*/
 	const string modelname = "triangle_mat";
 	const string filename = modelname + ".obj";	//"triangle_mat.obj
-	const string directoryPath = "Resoruces/" + modelname + "/";	//"Resources/triangle_mat/"
+	const string directoryPath = "Resources/" + modelname + "/";	//"Resources/triangle_mat/"
 	file.open(directoryPath + filename);	//"Resources/triangle_mat/triangle_mat.obj"
 	//ファイルオープン時に失敗をチェック
 	if (file.fail())
